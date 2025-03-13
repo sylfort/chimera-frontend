@@ -33,4 +33,4 @@ jobs:
           aws-region: us-west-1
 
       - name: Deploy to S3
-        run: aws s3 sync ./dist s3://img-recog-frontend-bucket --delete # Correct path
+        run: aws s3 sync ./dist s3://img-recog-frontend-bucket/dist --delete # Correct path
