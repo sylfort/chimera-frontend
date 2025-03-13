@@ -19,11 +19,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install  # Or yarn install
-        working-directory: ./my-image-recognition-app  # Correct path
+        working-directory: ./  # Correct path
 
       - name: Build frontend
         run: npm run build  # Or your build command
-        working-directory: ./my-image-recognition-app # Correct path
+        working-directory: ./ # Correct path
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -33,4 +33,4 @@ jobs:
           aws-region: us-west-1
 
       - name: Deploy to S3
-        run: aws s3 sync ./my-image-recognition-app/dist s3://img-recog-frontend-bucket --delete # Correct path
+        run: aws s3 sync ./dist s3://img-recog-frontend-bucket --delete # Correct path
