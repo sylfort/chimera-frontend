@@ -1,3 +1,4 @@
+// ./api/api.js
 import axios from "axios";
 
 // Use a relative URL since the frontend is served by the Flask app

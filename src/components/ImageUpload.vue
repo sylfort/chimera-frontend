@@ -1,28 +1,30 @@
 <template>
-  <div class="image-upload">
-    <h2>Upload an Image</h2>
-    <input
-      type="file"
-      accept="image/*"
-      @change="onFileChange"
-      ref="fileInput"
-    />
-    <div v-if="imagePreview" class="preview-container">
-      <p>Preview:</p>
-      <img :src="imagePreview" alt="Image preview" class="preview" />
-    </div>
-    <button @click="uploadImage" :disabled="!selectedFile || isUploading">
-      {{ isUploading ? "Uploading..." : "Submit" }}
-    </button>
-    <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
-    <!-- Simple display of the response image -->
-    <div v-if="responseImageUrl" class="response-image">
-      <p>Response Image:</p>
-      <img :src="responseImageUrl" alt="Response image" class="preview" />
+  <div>
+    <h2 class="h2-center">Upload an Image</h2>
+    <div class="image-upload">
+      <input
+        type="file"
+        accept="image/*"
+        @change="onFileChange"
+        ref="fileInput"
+        id="file-input"
+      />
+      <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
+      <!-- Display the API response image -->
+      <div v-if="responseImageUrl" class="response-image">
+        <p>Response Image:</p>
+        <img :src="responseImageUrl" alt="Response image" class="preview" />
+      </div>
+      <div v-if="imagePreview" class="preview-container">
+        <img :src="imagePreview" alt="Image preview" class="preview" />
+      </div>
+      <button @click="uploadImage" :disabled="!selectedFile || isUploading">
+        {{ isUploading ? "Uploading..." : "Submit" }}
+      </button>
     </div>
   </div>
 </template>
-  
+
 <script>
 import { uploadImage as apiUploadImage } from "../api/api";
 
@@ -33,6 +35,7 @@ export default {
     return {
       selectedFile: null,
       imagePreview: null,
+      responseImageUrl: null,
       isUploading: false,
       errorMsg: "",
     };
@@ -59,31 +62,29 @@ export default {
       this.isUploading = true;
       this.errorMsg = "";
       try {
+        // Uncomment the line below to use the actual API
         const response = await apiUploadImage(this.selectedFile);
-        console.log(response);
-      //   const response = {
-      // "img": "http://18.144.20.162/data/final/34e663b3-e469-474a-b33b-3bf18ca5fa24.jpg",
-      // "results": {
-      //     "class": {
-      //         "kinoko": 6,
-      //         "takenoko": 5
-      //     }
-      //   }
-      // }
-        
-        // Store the image URL from the response
+        // const response = {
+        //   img:
+        //     "http://54.177.247.235/data/final/5acd520e-6f24-466b-ad99-f21fa77034b0.jpg",
+        //   results: {
+        //     class: {
+        //       kinoko: 8,
+        //       takenoko: 9,
+        //     },
+        //   },
+        // };
+
         if (response && response.img) {
           this.responseImageUrl = response.img;
         }
-        
-        // Pass the actual counts to the parent component
+
         if (response && response.results && response.results.class) {
           const counts = {
             kinoko: response.results.class.kinoko || 0,
-            takenoko: response.results.class.takenoko || 0
+            takenoko: response.results.class.takenoko || 0,
           };
-          
-          // Emit the counts to parent component (App.vue)
+          // Emit the counts to the parent component
           this.$emit("imageUploaded", counts);
         } else {
           throw new Error("Invalid response from server.");
@@ -98,28 +99,40 @@ export default {
         this.imagePreview = null;
       }
     },
-    // resetInput() {
-    //   this.selectedFile = null;
-    //   this.imagePreview = null;
-    //   this.$refs.fileInput.value = null;
-    // },
   },
 };
 </script>
-  
+
 <style scoped>
-.image-upload {
+.h2-center {
   text-align: center;
 }
-.preview-container, .response-image {
-  margin: 1em 0;
+.image-upload {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
+.preview-container,
+.response-image {
+  /* Additional styling if needed */
+}
+
 .preview {
-  max-width: 100%;
-  height: auto;
+  max-width: auto;
+  height: 150px;
   border: 1px solid #ddd;
   padding: 0.5em;
 }
+
+#file-input {
+  max-width: 100px;
+  width: 100px;
+}
+
+input[type="file"] {
+  color: transparent;
+}
+
 button {
   padding: 0.5em 1em;
   cursor: pointer;

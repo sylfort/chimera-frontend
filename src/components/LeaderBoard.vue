@@ -1,118 +1,227 @@
 <template>
-    <div class="leaderboard">
-      <h2>Leaderboard</h2>
-      <div class="bar-chart">
-        <div class="bar-container">
-          <div class="sweet-name">Kinoko</div>
-          <div class="bar-outer">
-            <div class="bar kinoko-bar" :style="{ width: getBarWidth('kinoko') }">
-              <transition name="count">
-                <span class="sweet-count">{{ counts.kinoko }}</span>
-              </transition>
-            </div>
+  <div class="leaderboard">
+    <h2>Leaderboard</h2>
+    <div class="bar-chart">
+      <div class="bar-container">
+        <div class="sweet-name">Kinoko: {{ counts.kinoko }}</div>
+        <div class="bar-wrapper">
+          <div ref="kinokoContainer" class="bar-outer">
+            <!-- SVG will be inserted here by D3 -->
           </div>
+          <div class="count-label"></div>
         </div>
-        
-        <div class="bar-container">
-          <div class="sweet-name">Takenoko</div>
-          <div class="bar-outer">
-            <div class="bar takenoko-bar" :style="{ width: getBarWidth('takenoko') }">
-              <transition name="count">
-                <span class="sweet-count">{{ counts.takenoko }}</span>
-              </transition>
-            </div>
+      </div>
+      <div class="bar-container">
+        <div class="sweet-name">Takenoko: {{ counts.takenoko }}</div>
+        <div class="bar-wrapper">
+          <div ref="takenokoContainer" class="bar-outer">
+            <!-- SVG will be inserted here by D3 -->
           </div>
+          <div class="count-label"></div>
         </div>
       </div>
     </div>
-  </template>
-    
-  <script>
-  export default {
-    name: "LeaderBoard",
-    props: {
-      counts: {
-        type: Object,
-        required: true,
-      },
+  </div>
+</template>
+
+<script>
+import * as d3 from "d3";
+
+export default {
+  name: "LeaderBoard",
+  props: {
+    counts: {
+      type: Object,
+      default: () => ({
+        kinoko: 5,
+        takenoko: 2,
+      }),
     },
-    methods: {
-      getBarWidth(type) {
-        const total = this.counts.kinoko + this.counts.takenoko;
-        if (total === 0) return '0%';
-        
-        const percentage = (this.counts[type] / total) * 100;
-        return `${Math.max(percentage, 5)}%`; // Minimum 5% width for visibility
-      }
-    }
-  };
-  </script>
-    
-  <style scoped>
-  .leaderboard {
-    max-width: 600px;
-    margin: 0 auto;
-    text-align: center;
-    padding: 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  .bar-chart {
-    margin-top: 20px;
-  }
-  
-  .bar-container {
-    margin-bottom: 20px;
-  }
-  
-  .sweet-name {
-    font-weight: bold;
-    text-align: left;
-    margin-bottom: 5px;
-    font-size: 1.2em;
-  }
-  
-  .bar-outer {
-    width: 100%;
-    height: 40px;
-    background-color: #f0f0f0;
-    border-radius: 20px;
-    overflow: hidden;
-  }
-  
-  .bar {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 15px;
-    border-radius: 20px;
-    transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  
-  .kinoko-bar {
-    background: linear-gradient(to right, #8B4513, #D2691E);
-  }
-  
-  .takenoko-bar {
-    background: linear-gradient(to right, #4ecd78, #8ee56c);
-  }
-  
-  .sweet-count {
-    font-size: 1.4em;
-    font-weight: bold;
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Count animation */
-  .count-enter-active, .count-leave-active {
-    transition: all 0.5s;
-  }
-  .count-enter-from, .count-leave-to {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  </style>
+  },
+  data() {
+    return {
+      baseline: 0.5,
+      scaleFactor: 0.02,
+      kinokoSvg: null,
+      takenokoSvg: null,
+      kinokoBar: null,
+      takenokoBar: null,
+      kinokoText: null,
+      takenokoText: null,
+    };
+  },
+  mounted() {
+    this.initializeBar(
+      this.$refs.kinokoContainer,
+      "#D2691E",
+      "kinokoSvg",
+      "kinokoBar",
+      "kinokoText",
+      this.counts.kinoko
+    );
+    this.initializeBar(
+      this.$refs.takenokoContainer,
+      "#8ee56c",
+      "takenokoSvg",
+      "takenokoBar",
+      "takenokoText",
+      this.counts.takenoko
+    );
+  },
+  watch: {
+    "counts.kinoko"(newVal) {
+      this.animateBar(this.kinokoBar, this.kinokoText, newVal);
+    },
+    "counts.takenoko"(newVal) {
+      this.animateBar(this.takenokoBar, this.takenokoText, newVal);
+    },
+  },
+  methods: {
+    /**
+     * Initialize a D3 progress bar.
+     */
+    initializeBar(
+      container,
+      color,
+      svgProp,
+      barProp,
+      textProp,
+      initialValue
+    ) {
+      const width = container.clientWidth;
+      const height = 40;
+
+      // Create the SVG container
+      this[svgProp] = d3
+        .select(container)
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("class", "progress-svg");
+
+      // Add background bar (trail)
+      this[svgProp]
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", width)
+        .attr("height", height)
+        .attr("rx", 20)
+        .attr("ry", 20)
+        .attr("fill", "#eee");
+
+      // Add progress bar
+      this[barProp] = this[svgProp]
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", this.calculateWidth(initialValue, width))
+        .attr("height", height)
+        .attr("rx", 20)
+        .attr("ry", 20)
+        .attr("fill", color);
+
+      // Add text label
+      this[textProp] = this[svgProp]
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", -10)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#000")
+        .text(initialValue);
+    },
+
+    /**
+     * Calculate width for a bar based on a value.
+     */
+    calculateWidth(value, totalWidth) {
+      const percentage = this.baseline + value * this.scaleFactor;
+      return Math.min(percentage, 1) * totalWidth;
+    },
+
+    /**
+     * Animate a progress bar.
+     */
+    animateBar(bar, text, updateAmount) {
+      const width = bar.node().parentNode.getBoundingClientRect()
+        .width;
+      const newWidth = this.calculateWidth(updateAmount, width);
+
+      // Animate the bar width
+      bar
+        .transition()
+        .duration(1000)
+        .ease(d3.easeCubicInOut)
+        .attr("width", newWidth)
+        .on("end", () => {
+          text.text(updateAmount);
+        });
+
+      // Animate the text update
+      text
+        .transition()
+        .duration(1000)
+        .tween("text", () => {
+          const currentText = +text.text();
+          const interpolate = d3.interpolateNumber(currentText, updateAmount);
+          return (t) => {
+            text.text(Math.round(interpolate(t)));
+          };
+        });
+    },
+  },
+};
+</script>
+
+<style scoped>
+.leaderboard {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.bar-chart {
+  margin-top: 20px;
+}
+
+.bar-container {
+  margin-bottom: 20px;
+}
+
+.sweet-name {
+  font-weight: bold;
+  font-size: 1.2em;
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.bar-outer {
+  flex-grow: 1;
+  height: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.count-label {
+  min-width: 100px;
+  text-align: left;
+  font-weight: 500;
+  color: #555;
+}
+
+/* Style for the SVG progress text */
+.progress-svg text {
+  font-size: 14px;
+  font-weight: bold;
+}
+</style>
