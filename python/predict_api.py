@@ -442,4 +442,4 @@ if __name__ == '__main__':
     app.config['RAW_DATA'].mkdir(parents=True, exist_ok=True)
 
     # Run app
-    app.run(host='0.0.0.0', port=port, debug=True) # Don't use debug=True, model will be loaded twice
+    app.run(host='0.0.0.0', port=port, debug=False) # Don't use debug=True, model will be loaded twice
