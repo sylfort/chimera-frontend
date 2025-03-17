@@ -1,3 +1,4 @@
+<!-- App.vue -->
 <template>
   <div id="app">
     <header class="app-header">
@@ -13,7 +14,9 @@
         <ImageUpload @imageUploaded="handleImageUploaded" />
       </section>
       <section class="leaderboard-section">
-        <LeaderBoard :counts="leaderboardCounts" />
+        <LeaderBoard 
+        :kinoko="leaderboardCounts.kinoko" :takenoko="leaderboardCounts.takenoko" 
+  />
       </section>
     </main>
   </div>
@@ -31,27 +34,78 @@ export default {
   },
   data() {
     return {
-      leaderboardCounts: { kinoko: 2, takenoko: 5 }
+      leaderboardCounts: {
+        kinoko: 5, // Initial values
+        takenoko: 2,
+      },
     };
   },
   methods: {
-    /**
-     * Update leaderboard counts based on the image upload response.
-     */
-    handleImageUploaded(counts) {
-      this.leaderboardCounts = {
-        kinoko: counts.kinoko,
-        takenoko: counts.takenoko
-      };
+    handleImageUploaded(newCounts) {
+      // Update leaderboardCounts with the new totals
+      this.leaderboardCounts.kinoko += newCounts.kinoko;
+      this.leaderboardCounts.takenoko += newCounts.takenoko;
+      console.log("Updated leaderboardCounts:", this.leaderboardCounts);
     },
+  },
+  // data() {
+  //   return {
+  //     kinokoCount: 0,
+  //     takenokoCount: 0,
+  //   };
+  // },
+  // methods: {
+  //   /**
+  //    * Update leaderboard counts based on the image upload response.
+  //    */
+  //   // handleImageUploaded(counts) {
+  //   //   console.log(counts);
+  //   //   this.leaderboardCounts = counts;
+  //   // },
+  //   handleImageUploaded(counts) {
+  //     // Create a new object so that the prop change is detected
+  //     this.leaderboardCounts = { ...counts };
+  //     console.log(this.leaderboardCounts)
+  //   },
+  //   updateKinoko(value) {
+  //     this.kinokoCount = value;
+  //   },
+  //   updateTakenoko(value) {
+  //     this.takenokoCount = value;
+  //   },
     /**
      * Toggle language between English and Japanese.
      */
     toggleLanguage() {
       this.$i18n.locale = this.$i18n.locale === "en" ? "ja" : "en";
     }
-  }
-};
+  };
+
+//   data() {
+//     return {
+//       kinokoCount: 0,
+//       takenokoCount: 0,
+//     };
+//   },
+//   methods: {
+//     // Update them separately wherever needed
+//     updateKinoko(value) {
+//       this.kinokoCount = value;
+//     },
+//     updateTakenoko(value) {
+//       this.takenokoCount = value;
+//     },
+//     // Or if you're updating from an API response:
+//     handleApiResponse(data) {
+//       if (data.kinoko !== undefined) {
+//         this.kinokoCount = data.kinoko;
+//       }
+//       if (data.takenoko !== undefined) {
+//         this.takenokoCount = data.takenoko;
+//       }
+//     }
+//   }
+// };
 </script>
 
 <style>

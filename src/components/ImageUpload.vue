@@ -1,3 +1,4 @@
+<!-- ImageUpload.vue -->
 <template>
   <div>
     <h2 class="h2-center">{{ $t("imageUpload.uploadTitle") }}</h2>
@@ -101,7 +102,7 @@ export default {
         //   results: {
         //     class: {
         //       kinoko: 1,
-        //       takenoko: 2
+        //       takenoko: 3,
         //     }
         //   }
         // };
@@ -112,8 +113,8 @@ export default {
 
         if (response && response.results && response.results.class) {
           const counts = {
-            kinoko: response.results.class.kinoko || 0,
-            takenoko: response.results.class.takenoko || 0
+            kinoko: response.results.class.kinoko,
+            takenoko: response.results.class.takenoko,
           };
           this.$emit("imageUploaded", counts);
         } else {
@@ -153,6 +154,12 @@ export default {
   justify-content: center;
 }
 
+.upload-button,
+.submit-button {
+  width: 150px; /* or any desired width */
+  box-sizing: border-box;
+}
+
 .upload-button {
   background-color: #cccccc; /* Green */
   border: none;
@@ -164,7 +171,8 @@ export default {
   font-size: 16px;
   margin: 4px 2px;
   cursor: pointer;
-  border-radius: 5px; /* Optional: Rounded corners */
+  border-radius: 5px;
+  min-width: 110px;
 }
 
 .submit-button {
@@ -179,7 +187,8 @@ export default {
   margin: 4px 2px;
   cursor: pointer;
   border-radius: 5px;
-  min-width: 70px;
+  min-width: 110px;
+  /* max-width: 150px; */
 }
 
 .upload-button:hover {
@@ -206,7 +215,7 @@ export default {
   max-height: 150px;
   border: 1px solid #ddd;
   padding: 0.5em;
-  margin-left: -4em;
+  margin-left: 0;
   cursor: zoom-in;
 }
 
@@ -256,7 +265,7 @@ export default {
 /* The rest of your styles */
 #file-input {
   max-width: 150px;
-  width: 150px;
+  width: 120px;
 }
 input[type="file"] {
   color: transparent;
@@ -268,5 +277,52 @@ input[type="file" i]::-webkit-file-upload-button {
 .error {
   margin-top: 0.5em;
   color: red;
+}
+
+/* Mobile-specific styles */
+@media only screen and (max-width: 600px) {
+  .image-upload {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Make the buttons full width (or nearly) and center-align text */
+  .upload-button,
+  .submit-button {
+    width: 90%;
+    margin: 10px 0;
+    text-align: center;
+    min-width: 20px;
+  }
+
+  /* Reorder the elements for a logical mobile layout */
+  .upload-button {
+    order: 1;
+  }
+
+  /* If an error message is shown, it appears after the upload button */
+  .error {
+    order: 2;
+  }
+
+  /* The image previews come after the buttons */
+  .preview-container,
+  .response-image {
+    order: 3;
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  /* Adjust the preview image styles */
+  .preview {
+    max-height: 250px; /* Optionally increase max-height for mobile */
+    margin-left: 0; /* Remove negative margin to prevent overlapping */
+  }
+
+  /* The submit button comes last */
+  .submit-button {
+    order: 4;
+  }
 }
 </style>

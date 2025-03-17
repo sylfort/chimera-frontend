@@ -1,11 +1,13 @@
+<!-- // LeaderBoard.vue - Fixed version -->
+
+<!-- LeaderBoard.vue -->
 <template>
   <div class="leaderboard">
     <h2>{{ $t("leaderboard.title") }}</h2>
     <div class="bar-chart">
       <div class="bar-container">
-        <!-- Display the cumulative value with an internationalized label -->
         <div class="sweet-name">
-          {{ $t("leaderboard.kinoko") }}: {{ cumulative.kinoko }}
+          {{ $t("leaderboard.kinoko") }}: {{ kinoko }}
         </div>
         <div class="bar-wrapper">
           <div ref="kinokoContainer" class="bar-outer">
@@ -16,7 +18,7 @@
       </div>
       <div class="bar-container">
         <div class="sweet-name">
-          {{ $t("leaderboard.takenoko") }}: {{ cumulative.takenoko }}
+          {{ $t("leaderboard.takenoko") }}: {{ takenoko }}
         </div>
         <div class="bar-wrapper">
           <div ref="takenokoContainer" class="bar-outer">
@@ -35,40 +37,38 @@ import * as d3 from "d3";
 export default {
   name: "LeaderBoard",
   props: {
-    // The incoming `counts` represent the incremental updates
-    counts: {
-      type: Object,
-      default: () => ({
-        kinoko: 5,
-        takenoko: 2
-      })
-    }
+    kinoko: {
+      type: Number,
+      default: 0,
+    },
+    takenoko: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
       baseline: 0.5,
       scaleFactor: 0.02,
-      // Store the current cumulative totals here (initialized with default values)
-      cumulative: {
-        kinoko: 5,
-        takenoko: 2
-      },
+      // Remove the duplicate state:
+      // cumulative: { kinoko: 5, takenoko: 2 },
       kinokoSvg: null,
       takenokoSvg: null,
       kinokoBar: null,
       takenokoBar: null,
       kinokoText: null,
-      takenokoText: null
+      takenokoText: null,
     };
   },
   mounted() {
+    // Use the props for initialization:
     this.initializeBar(
       this.$refs.kinokoContainer,
       "#D2691E",
       "kinokoSvg",
       "kinokoBar",
       "kinokoText",
-      this.cumulative.kinoko
+      this.kinoko
     );
     this.initializeBar(
       this.$refs.takenokoContainer,
@@ -76,31 +76,19 @@ export default {
       "takenokoSvg",
       "takenokoBar",
       "takenokoText",
-      this.cumulative.takenoko
+      this.takenoko
     );
   },
   watch: {
-    "counts.kinoko"(increment) {
-      this.animateBar(this.kinokoBar, this.kinokoText, "kinoko", increment);
+    kinoko(newVal) {
+      this.updateKinoko(newVal);
     },
-    "counts.takenoko"(increment) {
-      this.animateBar(
-        this.takenokoBar,
-        this.takenokoText,
-        "takenoko",
-        increment
-      );
-    }
+    takenoko(newVal) {
+      this.updateTakenoko(newVal);
+    },
   },
   methods: {
-    initializeBar(
-      container,
-      color,
-      svgProp,
-      barProp,
-      textProp,
-      initialValue
-    ) {
+    initializeBar(container, color, svgProp, barProp, textProp, initialValue) {
       const width = container.clientWidth;
       const height = 40;
       this[svgProp] = d3
@@ -142,31 +130,38 @@ export default {
       const percentage = this.baseline + value * this.scaleFactor;
       return Math.min(percentage, 1) * totalWidth;
     },
-    animateBar(bar, text, key, increment) {
-      this.cumulative[key] += increment;
+    animateBar(bar, text, newTotal) {
       const currentValue = +text.text();
-      const newTotal = this.cumulative[key];
-      const containerWidth =
-        bar.node().parentNode.getBoundingClientRect().width;
+      const containerWidth = bar.node().parentNode.getBoundingClientRect().width;
       const newWidth = this.calculateWidth(newTotal, containerWidth);
 
+      // Animate the SVG bar's width
       bar
         .transition()
         .duration(1000)
         .ease(d3.easeCubicInOut)
         .attr("width", newWidth);
 
+      // Animate the text number within the SVG
       text
         .transition()
         .duration(1000)
         .tween("text", () => {
           const interpolate = d3.interpolateNumber(currentValue, newTotal);
-          return t => {
+          return (t) => {
             text.text(Math.round(interpolate(t)));
           };
         });
-    }
-  }
+    },
+    updateKinoko(newKinoko) {
+      console.log("Updating kinoko to:", newKinoko);
+      this.animateBar(this.kinokoBar, this.kinokoText, newKinoko);
+    },
+    updateTakenoko(newTakenoko) {
+      console.log("Updating takenoko to:", newTakenoko);
+      this.animateBar(this.takenokoBar, this.takenokoText, newTakenoko);
+    },
+  },
 };
 </script>
 
@@ -209,12 +204,12 @@ export default {
   overflow: hidden;
 }
 
-.count-label {
+/* .count-label {
   min-width: 100px;
   text-align: left;
   font-weight: 500;
   color: #555;
-}
+} */
 
 .progress-svg text {
   font-size: 14px;
