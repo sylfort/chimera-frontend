@@ -47,38 +47,12 @@ export default {
       this.leaderboardCounts.takenoko += newCounts.takenoko;
       console.log("Updated leaderboardCounts:", this.leaderboardCounts);
     },
-  },
-  // data() {
-  //   return {
-  //     kinokoCount: 0,
-  //     takenokoCount: 0,
-  //   };
-  // },
-  // methods: {
-  //   /**
-  //    * Update leaderboard counts based on the image upload response.
-  //    */
-  //   // handleImageUploaded(counts) {
-  //   //   console.log(counts);
-  //   //   this.leaderboardCounts = counts;
-  //   // },
-  //   handleImageUploaded(counts) {
-  //     // Create a new object so that the prop change is detected
-  //     this.leaderboardCounts = { ...counts };
-  //     console.log(this.leaderboardCounts)
-  //   },
-  //   updateKinoko(value) {
-  //     this.kinokoCount = value;
-  //   },
-  //   updateTakenoko(value) {
-  //     this.takenokoCount = value;
-  //   },
-    /**
-     * Toggle language between English and Japanese.
-     */
     toggleLanguage() {
+      console.log("aqui")
       this.$i18n.locale = this.$i18n.locale === "en" ? "ja" : "en";
     }
+  },
+
   };
 
 //   data() {
