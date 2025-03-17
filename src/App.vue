@@ -1,9 +1,12 @@
 <template>
   <div id="app">
     <header class="app-header">
-      <h1>Sweets Recognition Leaderboard</h1>
-      <p>Upload an image of either Kinoko no Yama or Takenoko no Sato</p>
-      <p>Let's see which sweet is the most beloved!</p>
+      <h1 v-html="$t('app.title')"></h1>
+      <!-- <h2>{{ $t("app.subtitle") }}</h2> -->
+      <p v-html="$t('app.description1')"></p>
+      <p>{{ $t("app.description2") }}</p>
+      <!-- Toggle language button -->
+      <button class="modern-button" @click="toggleLanguage">{{ $t("app.toggleLang") }}</button>
     </header>
     <main>
       <section class="upload-section">
@@ -24,25 +27,30 @@ export default {
   name: "App",
   components: {
     ImageUpload,
-    LeaderBoard,
+    LeaderBoard
   },
   data() {
     return {
-      leaderboardCounts: { kinoko: 2, takenoko: 5 },
+      leaderboardCounts: { kinoko: 2, takenoko: 5 }
     };
   },
   methods: {
     /**
-     * Updates the leaderboard counts with the values from the API response.
-     * @param {Object} counts - The counts object from the API response.
+     * Update leaderboard counts based on the image upload response.
      */
     handleImageUploaded(counts) {
       this.leaderboardCounts = {
         kinoko: counts.kinoko,
-        takenoko: counts.takenoko,
+        takenoko: counts.takenoko
       };
     },
-  },
+    /**
+     * Toggle language between English and Japanese.
+     */
+    toggleLanguage() {
+      this.$i18n.locale = this.$i18n.locale === "en" ? "ja" : "en";
+    }
+  }
 };
 </script>
 
@@ -63,6 +71,25 @@ body {
   background-position: 0 0, 10px 10px;
 }
 
+.modern-button {
+      background-color: #D2691E; /* A modern blue */
+      color: #fff;
+      border: none;
+      outline: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .modern-button:hover {
+      background-color: #D2691E;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
 #app {
   max-width: 900px;
   margin: 0 auto;
@@ -82,12 +109,26 @@ h1 {
   color: #e83e8c;
   font-weight: 700;
   font-size: 2.5em;
-  margin-bottom: 0.5em;
+  margin-bottom: 0;
+  margin-top: 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.kinoko {
+  color: #D2691E;
+}
+
+.takenoko {
+  color: #4caf50;
+}
+
+h2 {
+  margin-top: 0;
+  color: #491212;
+}
+
 p {
-  color: #6c757d;
+  color: #53595f;
   font-size: 1.2em;
   line-height: 1.4;
 }
@@ -104,7 +145,6 @@ button {
 }
 
 button:hover {
-  transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 </style>
