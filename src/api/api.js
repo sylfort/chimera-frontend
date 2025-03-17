@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // Use a relative URL since the frontend is served by the Flask app
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || "http://localhost";
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || "/";
 
 // export const uploadImage = async (file) => {
 //   // Create form data and append file and parameters.
@@ -38,7 +38,7 @@ export const uploadImage = async (file) => {
   formData.append("save_txt", "T"); // Optional, matches your Vue.js behavior
 
   try {
-    const response = await axios.post(`${BASE_URL}/predict`, formData, {
+    const response = await axios.post(`${BASE_URL}predict`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

@@ -1,12 +1,9 @@
 <template>
   <div class="leaderboard">
-    <h2>{{ $t("leaderboard.title") }}</h2>
+    <h2>Leaderboard</h2>
     <div class="bar-chart">
       <div class="bar-container">
-        <!-- Display the cumulative value with an internationalized label -->
-        <div class="sweet-name">
-          {{ $t("leaderboard.kinoko") }}: {{ cumulative.kinoko }}
-        </div>
+        <div class="sweet-name">Kinoko: {{ counts.kinoko }}</div>
         <div class="bar-wrapper">
           <div ref="kinokoContainer" class="bar-outer">
             <!-- SVG will be inserted here by D3 -->
@@ -15,9 +12,7 @@
         </div>
       </div>
       <div class="bar-container">
-        <div class="sweet-name">
-          {{ $t("leaderboard.takenoko") }}: {{ cumulative.takenoko }}
-        </div>
+        <div class="sweet-name">Takenoko: {{ counts.takenoko }}</div>
         <div class="bar-wrapper">
           <div ref="takenokoContainer" class="bar-outer">
             <!-- SVG will be inserted here by D3 -->
@@ -35,30 +30,24 @@ import * as d3 from "d3";
 export default {
   name: "LeaderBoard",
   props: {
-    // The incoming `counts` represent the incremental updates
     counts: {
       type: Object,
       default: () => ({
         kinoko: 5,
-        takenoko: 2
-      })
-    }
+        takenoko: 2,
+      }),
+    },
   },
   data() {
     return {
       baseline: 0.5,
       scaleFactor: 0.02,
-      // Store the current cumulative totals here (initialized with default values)
-      cumulative: {
-        kinoko: 5,
-        takenoko: 2
-      },
       kinokoSvg: null,
       takenokoSvg: null,
       kinokoBar: null,
       takenokoBar: null,
       kinokoText: null,
-      takenokoText: null
+      takenokoText: null,
     };
   },
   mounted() {
@@ -68,7 +57,7 @@ export default {
       "kinokoSvg",
       "kinokoBar",
       "kinokoText",
-      this.cumulative.kinoko
+      this.counts.kinoko
     );
     this.initializeBar(
       this.$refs.takenokoContainer,
@@ -76,23 +65,21 @@ export default {
       "takenokoSvg",
       "takenokoBar",
       "takenokoText",
-      this.cumulative.takenoko
+      this.counts.takenoko
     );
   },
   watch: {
-    "counts.kinoko"(increment) {
-      this.animateBar(this.kinokoBar, this.kinokoText, "kinoko", increment);
+    "counts.kinoko"(newVal) {
+      this.animateBar(this.kinokoBar, this.kinokoText, newVal);
     },
-    "counts.takenoko"(increment) {
-      this.animateBar(
-        this.takenokoBar,
-        this.takenokoText,
-        "takenoko",
-        increment
-      );
-    }
+    "counts.takenoko"(newVal) {
+      this.animateBar(this.takenokoBar, this.takenokoText, newVal);
+    },
   },
   methods: {
+    /**
+     * Initialize a D3 progress bar.
+     */
     initializeBar(
       container,
       color,
@@ -103,6 +90,8 @@ export default {
     ) {
       const width = container.clientWidth;
       const height = 40;
+
+      // Create the SVG container
       this[svgProp] = d3
         .select(container)
         .append("svg")
@@ -110,6 +99,7 @@ export default {
         .attr("height", height)
         .attr("class", "progress-svg");
 
+      // Add background bar (trail)
       this[svgProp]
         .append("rect")
         .attr("x", 0)
@@ -120,6 +110,7 @@ export default {
         .attr("ry", 20)
         .attr("fill", "#eee");
 
+      // Add progress bar
       this[barProp] = this[svgProp]
         .append("rect")
         .attr("x", 0)
@@ -130,6 +121,7 @@ export default {
         .attr("ry", 20)
         .attr("fill", color);
 
+      // Add text label
       this[textProp] = this[svgProp]
         .append("text")
         .attr("x", width / 2)
@@ -138,35 +130,46 @@ export default {
         .attr("fill", "#000")
         .text(initialValue);
     },
+
+    /**
+     * Calculate width for a bar based on a value.
+     */
     calculateWidth(value, totalWidth) {
       const percentage = this.baseline + value * this.scaleFactor;
       return Math.min(percentage, 1) * totalWidth;
     },
-    animateBar(bar, text, key, increment) {
-      this.cumulative[key] += increment;
-      const currentValue = +text.text();
-      const newTotal = this.cumulative[key];
-      const containerWidth =
-        bar.node().parentNode.getBoundingClientRect().width;
-      const newWidth = this.calculateWidth(newTotal, containerWidth);
 
+    /**
+     * Animate a progress bar.
+     */
+    animateBar(bar, text, updateAmount) {
+      const width = bar.node().parentNode.getBoundingClientRect()
+        .width;
+      const newWidth = this.calculateWidth(updateAmount, width);
+
+      // Animate the bar width
       bar
         .transition()
         .duration(1000)
         .ease(d3.easeCubicInOut)
-        .attr("width", newWidth);
+        .attr("width", newWidth)
+        .on("end", () => {
+          text.text(updateAmount);
+        });
 
+      // Animate the text update
       text
         .transition()
         .duration(1000)
         .tween("text", () => {
-          const interpolate = d3.interpolateNumber(currentValue, newTotal);
-          return t => {
+          const currentText = +text.text();
+          const interpolate = d3.interpolateNumber(currentText, updateAmount);
+          return (t) => {
             text.text(Math.round(interpolate(t)));
           };
         });
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -216,6 +219,7 @@ export default {
   color: #555;
 }
 
+/* Style for the SVG progress text */
 .progress-svg text {
   font-size: 14px;
   font-weight: bold;
