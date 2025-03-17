@@ -54,32 +54,6 @@ export default {
   },
 
   };
-
-//   data() {
-//     return {
-//       kinokoCount: 0,
-//       takenokoCount: 0,
-//     };
-//   },
-//   methods: {
-//     // Update them separately wherever needed
-//     updateKinoko(value) {
-//       this.kinokoCount = value;
-//     },
-//     updateTakenoko(value) {
-//       this.takenokoCount = value;
-//     },
-//     // Or if you're updating from an API response:
-//     handleApiResponse(data) {
-//       if (data.kinoko !== undefined) {
-//         this.kinokoCount = data.kinoko;
-//       }
-//       if (data.takenoko !== undefined) {
-//         this.takenokoCount = data.takenoko;
-//       }
-//     }
-//   }
-// };
 </script>
 
 <style>
