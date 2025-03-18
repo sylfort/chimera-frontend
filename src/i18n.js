@@ -23,7 +23,7 @@ const messages = {
       submit: "Submit",
       uploading: "Uploading...",
       invalidImage: "Please select a valid image file.",
-      uploadFailed: "Upload failed. Please try again.",
+      uploadFailed: "Upload failed. Please try again with a smaller file.",
       chooseFile: "Choose File",
     },
   },

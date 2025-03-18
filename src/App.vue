@@ -41,8 +41,8 @@ export default {
   data() {
     return {
       leaderboardCounts: {
-      kinoko: 433,
-      takenoko: 777,  
+      kinoko: 0,
+      takenoko: 0,
       }
     };
   },
