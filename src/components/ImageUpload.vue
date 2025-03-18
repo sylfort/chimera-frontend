@@ -101,8 +101,8 @@ export default {
         //     "http://54.177.247.235/data/final/5acd520e-6f24-466b-ad99-f21fa77034b0.jpg",
         //   results: {
         //     class: {
-        //       kinoko: 1,
-        //       takenoko: 3,
+        //       kinoko: 11,
+        //       takenoko: 23,
         //     }
         //   }
         // };

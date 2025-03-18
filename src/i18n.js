@@ -13,7 +13,7 @@ const messages = {
       toggleLang: "日本語", // Button text: switch to Japanese
     },
     leaderboard: {
-      title: "Leaderboard",
+      title: "Leaderboard(total scanned n°)",
       kinoko: "Kinoko",
       takenoko: "Takenoko",
     },
@@ -38,7 +38,7 @@ const messages = {
       toggleLang: "English", // Button text: switch to English
     },
     leaderboard: {
-      title: "スコア",
+      title: "スコア | スキャンされた合計数",
       kinoko: "きのこの山",
       takenoko: "たけのこの里",
     },

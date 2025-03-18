@@ -7,16 +7,22 @@
       <p v-html="$t('app.description1')"></p>
       <p>{{ $t("app.description2") }}</p>
       <!-- Toggle language button -->
-      <button class="modern-button" @click="toggleLanguage">{{ $t("app.toggleLang") }}</button>
+      <button class="modern-button" @click="toggleLanguage">
+        {{ $t("app.toggleLang") }}
+      </button>
     </header>
     <main>
       <section class="upload-section">
         <ImageUpload @imageUploaded="handleImageUploaded" />
       </section>
-      <section class="leaderboard-section">
+      <section class="leaderboard-section" v-if="leaderboardCounts">
         <LeaderBoard 
-        :kinoko="leaderboardCounts.kinoko" :takenoko="leaderboardCounts.takenoko" 
-  />
+          :kinoko="leaderboardCounts.kinoko" 
+          :takenoko="leaderboardCounts.takenoko" 
+        />
+      </section>
+      <section v-else class="leaderboard-section">
+        <p>Loading counts...</p>
       </section>
     </main>
   </div>
@@ -35,32 +41,62 @@ export default {
   data() {
     return {
       leaderboardCounts: {
-        kinoko: 5, // Initial values
-        takenoko: 2,
-      },
+      kinoko: 433,
+      takenoko: 777,  
+      }
     };
   },
   methods: {
     handleImageUploaded(newCounts) {
-      // Update leaderboardCounts with the new totals
-      this.leaderboardCounts.kinoko += newCounts.kinoko;
-      this.leaderboardCounts.takenoko += newCounts.takenoko;
+      if (this.leaderboardCounts) {
+        this.leaderboardCounts.kinoko += newCounts.kinoko;
+        this.leaderboardCounts.takenoko += newCounts.takenoko;
+      } else {
+        this.leaderboardCounts = { ...newCounts };
+      }
       console.log("Updated leaderboardCounts:", this.leaderboardCounts);
     },
     toggleLanguage() {
-      console.log("aqui")
+      console.log("Toggle language");
       this.$i18n.locale = this.$i18n.locale === "en" ? "ja" : "en";
-    }
+    },
+    // Retry fetchCounts with a maximum of maxAttempts attempts.
+    fetchCounts(attempt = 1) {
+      const maxAttempts = 3;
+      fetch("/counts")
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          this.leaderboardCounts = data;
+        })
+        .catch((error) => {
+          console.error(`Attempt ${attempt} failed:`, error);
+          if (attempt < maxAttempts) {
+            console.log(`Retrying in 2 seconds... (attempt ${attempt + 1})`);
+            setTimeout(() => {
+              this.fetchCounts(attempt + 1);
+            }, 2000);
+          } else {
+            console.error("Max attempts reached. Unable to fetch counts.");
+          }
+        });
+    },
   },
-
-  };
+  mounted() {
+    // Call the endpoint when the component mounts
+    this.fetchCounts();
+  },
+};
 </script>
 
 <style>
 /* Import the ludical font from Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap");
 
-/* Apply the font to the entire app */
 * {
   font-family: "Baloo 2", cursive;
 }
@@ -74,23 +110,23 @@ body {
 }
 
 .modern-button {
-      background-color: #D2691E; /* A modern blue */
-      color: #fff;
-      border: none;
-      outline: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
+  background-color: #d2691e;
+  color: #fff;
+  border: none;
+  outline: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 
-    .modern-button:hover {
-      background-color: #D2691E;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
+.modern-button:hover {
+  background-color: #d2691e;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
 
 #app {
   max-width: 900px;
@@ -117,7 +153,7 @@ h1 {
 }
 
 .kinoko {
-  color: #D2691E;
+  color: #d2691e;
 }
 
 .takenoko {
