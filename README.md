@@ -9,6 +9,10 @@ This repository contains the Vue.js frontend for the Japanese Sweets Image Class
 
 ## Overview
 
+<p align="center">  <!-- Optional: align="center" or align="left" -->
+  <img src="https://github.com/user-attachments/assets/7aed6d80-abf9-44a0-8212-5ebc8451a783" alt="Kansai Ben Quest image" width="500">
+</p>
+
 This single-page application (SPA) serves as the interactive client for the Python backend API. Users can:
 
 1.  **Upload Images:** Select an image file containing Kinoko no Yama or Takenoko no Sato sweets.
@@ -33,46 +37,9 @@ The frontend communicates with the backend API to send images for prediction and
 ## Tech Stack
 
 *   **Framework:** [Vue.js](https://vuejs.org/) (v3)
-*   **Build Tool:** [Vue CLI](https://cli.vuejs.org/)
-*   **HTTP Client:** [Axios](https://axios-http.com/)
 *   **Data Visualization:** [D3.js](https://d3js.org/) (for the leaderboard)
+*   **Fetching library:** [Axios](https://axios-http.com/)
 *   **Internationalization:** [Vue I18n](https://kazupon.github.io/vue-i18n/)
-*   **Styling:** CSS (scoped styles, potentially some global styles in `App.vue`)
-*   **Language:** JavaScript (ES6+)
-*   **Package Management:** npm
-
-## Screenshots
-
-*(Placeholder: Add screenshots of the UI here if available)*
-*   *Screenshot of the main page with upload button and leaderboard.*
-*   *Screenshot showing an uploaded image and the annotated result.*
-*   *Screenshot showing the enlarged image modal.*
-
-## Architecture & Interaction Flow
-
-1.  **Initial Load:**
-    *   The `App.vue` component mounts.
-    *   It makes a `GET` request to the backend's `/counts` endpoint to fetch the initial leaderboard totals.
-    *   The fetched counts are passed as props to the `LeaderBoard.vue` component.
-    *   `LeaderBoard.vue` uses D3.js to render the initial state of the bars.
-2.  **Image Upload:**
-    *   The user interacts with the `ImageUpload.vue` component to select a file.
-    *   A local preview of the selected image is shown.
-    *   Upon clicking "Submit", `ImageUpload.vue` sends a `POST` request with the image file (`multipart/form-data`) to the backend's `/predict` endpoint via `src/api/api.js`.
-3.  **Receiving Prediction:**
-    *   The backend processes the image, updates its database count, and returns a JSON response containing:
-        *   The counts for the *current* image (`results.class.kinoko`, `results.class.takenoko`).
-        *   A URL to the annotated image (`img`).
-    *   `ImageUpload.vue` displays the annotated image received from the backend URL.
-4.  **Updating Leaderboard:**
-    *   `ImageUpload.vue` emits an `imageUploaded` event containing the counts from the *current* image prediction.
-    *   `App.vue` listens for this event and updates its `leaderboardCounts` data by adding the new counts to the existing totals.
-    *   Vue's reactivity updates the props passed to `LeaderBoard.vue`.
-    *   `LeaderBoard.vue` watches for changes in its props and uses D3.js to animate the bars to reflect the new cumulative totals.
-5.  **Language Switching:**
-    *   The user clicks the language toggle button in `App.vue`.
-    *   `App.vue` changes the `locale` property of the `vue-i18n` instance.
-    *   All text elements using `$t(...)` automatically update to the selected language.
 
 ## Setup and Local Development
 
@@ -91,16 +58,7 @@ The frontend communicates with the backend API to send images for prediction and
     npm install
     ```
 
-4.  **Configure Backend API URL (Optional):**
-    *   The application expects the backend API to be running on the same host/port or proxied correctly.
-    *   By default (`src/api/api.js`), it uses `/` as the base URL.
-    *   If your backend runs on a different port during local development (e.g., `http://localhost:5000`), create a `.env.development.local` file in the project root with:
-        ```env
-        VUE_APP_API_BASE_URL=http://localhost:5000/
-        ```
-    *   Ensure the backend Flask application is running.
-
-5.  **Run Development Server:**
+4.  **Run Development Server:**
     ```bash
     npm run serve
     ```
