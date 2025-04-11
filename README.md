@@ -49,8 +49,7 @@ The frontend communicates with the backend API to send images for prediction and
 
 2.  **Clone the Repository:**
     ```bash
-    git clone <your-frontend-repo-url>
-    cd <your-frontend-repo-directory>
+    git clone https://github.com/sylfort/chimera-frontend.git
     ```
 
 3.  **Install Dependencies:**
