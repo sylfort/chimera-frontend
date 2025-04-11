@@ -39,7 +39,7 @@ The frontend communicates with the backend API to send images for prediction and
 *   **Framework:** [Vue.js](https://vuejs.org/) (v3)
 *   **Data Visualization:** [D3.js](https://d3js.org/) (for the leaderboard)
 *   **Fetching library:** [Axios](https://axios-http.com/)
-*   **Internationalization:** [Vue I18n](https://kazupon.github.io/vue-i18n/)
+*   **Internationalization:** [Vue i18n](https://kazupon.github.io/vue-i18n/)
 
 ## Setup and Local Development
 
