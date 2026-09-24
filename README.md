@@ -1,11 +1,11 @@
 # Japanese Sweets Image Classifier - Frontend (Kinoko vs Takenoko)
 
 [![Backend Repo](https://img.shields.io/badge/Backend%20Repo-GitHub-blue?logo=github)](https://github.com/sylfort/yolo-chimera) <!-- Update link if backend repo is different -->
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](http://ec2-54-215-114-190.us-west-1.compute.amazonaws.com)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](http://54.153.65.56/)
 
 This repository contains the Vue.js frontend for the Japanese Sweets Image Classifier project. It provides the user interface for uploading images, viewing detection results, checking the overall "popularity" leaderboard, and supports both English and Japanese languages.
 
-[View the Live Demo](http://ec2-54-215-114-190.us-west-1.compute.amazonaws.com)
+[View the Live Demo](http://54.153.65.56/)
 
 ## Overview
 
