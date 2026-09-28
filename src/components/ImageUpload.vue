@@ -89,12 +89,12 @@
 
 <script>
 import { uploadImage as apiUploadImage } from "../api/api";
-import kinokoSample from "@/assets/kinoko16.jpg";
-import takenokoSample from "@/assets/takenoko16.jpg";
+import kinokoSample from "@/assets/Kinokonoyama2.jpg";
+import takenokoSample from "@/assets/Takenokonosato2.jpg";
 
 const SAMPLES = [
-  { key: "kinoko", src: kinokoSample, fileName: "kinoko16.jpg" },
-  { key: "takenoko", src: takenokoSample, fileName: "takenoko16.jpg" },
+  { key: "kinoko", src: kinokoSample, fileName: "Kinokonoyama2.jpg" },
+  { key: "takenoko", src: takenokoSample, fileName: "Takenokonosato2.jpg" },
 ];
 const SAMPLE_MIME = "application/x-sample";
 
@@ -231,14 +231,16 @@ export default {
 
 .sample-card {
   margin: 0;
-  width: 140px;
+  width: 200px;
   text-align: center;
   cursor: pointer;
 }
 
 .sample-card img {
+  display: block;
   width: 100%;
-  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   cursor: grab;
@@ -413,7 +415,7 @@ input[type="file" i]::-webkit-file-upload-button {
   }
 
   .sample-card {
-    width: 110px;
+    width: 150px;
   }
 
   .drop-zone {
