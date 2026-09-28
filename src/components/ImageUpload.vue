@@ -4,8 +4,7 @@
     <h2 class="h2-center">{{ $t("imageUpload.uploadTitle") }}</h2>
 
     <!-- Sample images: drag into the drop zone or click to select -->
-    <p class="samples-hint">{{ $t("imageUpload.samplesHint") }}</p>
-    <div class="sample-gallery">
+    <div v-if="!selectedFile" class="sample-gallery">
       <figure
         v-for="sample in samples"
         :key="sample.key"
@@ -21,8 +20,18 @@
       </figure>
     </div>
 
-    <!-- Drop zone -->
+    <input
+      type="file"
+      accept="image/*"
+      @change="onFileChange"
+      ref="fileInput"
+      id="file-input"
+      style="display: none;"
+    />
+
+    <!-- Drop zone: hidden once an image is selected -->
     <div
+      v-if="!selectedFile"
       class="drop-zone"
       :class="{ dragging: isDragging }"
       @click="$refs.fileInput.click()"
@@ -34,31 +43,8 @@
       {{ $t("imageUpload.dropZone") }}
     </div>
 
-    <div class="image-upload">
-      <label for="file-input" class="upload-button">
-      {{ $t("imageUpload.chooseFile") }}
-    </label>
-      <input
-        type="file"
-        accept="image/*"
-        @change="onFileChange"
-        ref="fileInput"
-        id="file-input"
-        style="display: none;"        
-      />
-      <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
-
-      <!-- Response image preview -->
-      <div v-if="responseImageUrl" class="response-image">
-        <img
-          :src="responseImageUrl"
-          alt="Response image"
-          class="preview"
-          @click="openModal(responseImageUrl)"
-        />
-      </div>
-
-      <!-- Local image preview -->
+    <!-- Selected image preview + submit -->
+    <div v-else class="image-upload">
       <div v-if="imagePreview" class="preview-container">
         <img
           :src="imagePreview"
@@ -68,13 +54,28 @@
         />
       </div>
 
-      <button class="submit-button" @click="uploadImage" :disabled="!selectedFile || isUploading">
+      <button class="submit-button" @click="uploadImage" :disabled="isUploading">
         {{
           isUploading
             ? $t("imageUpload.uploading")
             : $t("imageUpload.submit")
         }}
       </button>
+      <button class="change-button" @click="clearSelection" :disabled="isUploading">
+        {{ $t("imageUpload.change") }}
+      </button>
+    </div>
+
+    <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
+
+    <!-- Response image preview -->
+    <div v-if="responseImageUrl" class="response-image">
+      <img
+        :src="responseImageUrl"
+        alt="Response image"
+        class="preview"
+        @click="openModal(responseImageUrl)"
+      />
     </div>
 
     <!-- Modal Overlay for enlarged image -->
@@ -199,6 +200,11 @@ export default {
         this.imagePreview = null;
       }
     },
+    clearSelection() {
+      this.selectedFile = null;
+      this.imagePreview = null;
+      this.$refs.fileInput.value = null;
+    },
     openModal(imageSrc) {
       this.modalImage = imageSrc;
       this.showModal = true;
@@ -214,12 +220,6 @@ export default {
 <style scoped>
 .h2-center {
   text-align: center;
-}
-
-.samples-hint {
-  text-align: center;
-  color: #555;
-  margin: 0 0 0.75em;
 }
 
 .sample-gallery {
@@ -258,8 +258,8 @@ export default {
 
 .drop-zone {
   max-width: 420px;
-  margin: 1.25em auto;
-  padding: 2em 1em;
+  margin: 1em auto;
+  padding: 1.25em 1em;
   border: 2px dashed #bbb;
   border-radius: 12px;
   text-align: center;
@@ -281,27 +281,17 @@ export default {
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 1em;
+  margin: 1em 0;
 }
 
-.upload-button,
+.image-upload .preview-container {
+  width: auto;
+}
+
 .submit-button {
   width: 150px; /* or any desired width */
   box-sizing: border-box;
-}
-
-.upload-button {
-  background-color: #cccccc; /* Green */
-  border: none;
-  color: rgb(34, 34, 34);
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 5px;
-  min-width: 110px;
 }
 
 .submit-button {
@@ -320,8 +310,18 @@ export default {
   /* max-width: 150px; */
 }
 
-.upload-button:hover {
-  background-color: #9b9b9b;
+.change-button {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 16px;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.change-button:hover {
+  color: #222;
 }
 
 .submit-button:hover {
@@ -405,6 +405,7 @@ input[type="file" i]::-webkit-file-upload-button {
 
 .error {
   margin-top: 0.5em;
+  text-align: center;
   color: red;
 }
 
@@ -430,7 +431,6 @@ input[type="file" i]::-webkit-file-upload-button {
   }
 
   /* Make the buttons full width (or nearly) and center-align text */
-  .upload-button,
   .submit-button {
     width: 90%;
     margin: 10px 0;
@@ -439,10 +439,6 @@ input[type="file" i]::-webkit-file-upload-button {
   }
 
   /* Reorder the elements for a logical mobile layout */
-  .upload-button {
-    order: 1;
-  }
-
   /* If an error message is shown, it appears after the upload button */
   .error {
     order: 2;
@@ -465,6 +461,10 @@ input[type="file" i]::-webkit-file-upload-button {
   /* The submit button comes last */
   .submit-button {
     order: 4;
+  }
+
+  .change-button {
+    order: 5;
   }
 }
 </style>
