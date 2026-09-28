@@ -15,7 +15,7 @@
       <section class="upload-section">
         <ImageUpload @imageUploaded="handleImageUploaded" />
       </section>
-      <section class="leaderboard-section" v-if="leaderboardCounts">
+      <section class="leaderboard-section" v-if="leaderboardCounts" ref="leaderboardSection">
         <LeaderBoard 
           :kinoko="leaderboardCounts.kinoko" 
           :takenoko="leaderboardCounts.takenoko" 
@@ -47,7 +47,11 @@ export default {
     };
   },
   methods: {
-    handleImageUploaded(newCounts) {
+    async handleImageUploaded(newCounts) {
+      // Let the upload section finish re-rendering, then scroll the leaderboard
+      // into view first so the user sees the bars animate
+      await this.$nextTick();
+      await this.scrollToLeaderboard();
       if (this.leaderboardCounts) {
         this.leaderboardCounts.kinoko += newCounts.kinoko;
         this.leaderboardCounts.takenoko += newCounts.takenoko;
@@ -55,6 +59,24 @@ export default {
         this.leaderboardCounts = { ...newCounts };
       }
       console.log("Updated leaderboardCounts:", this.leaderboardCounts);
+    },
+    scrollToLeaderboard() {
+      const section = this.$refs.leaderboardSection;
+      if (!section) return Promise.resolve();
+      return new Promise((resolve) => {
+        let done = false;
+        const finish = () => {
+          if (done) return;
+          done = true;
+          window.removeEventListener("scrollend", finish);
+          // Short pause after the scroll stops before the animation starts
+          setTimeout(resolve, 300);
+        };
+        window.addEventListener("scrollend", finish);
+        // Fallback for browsers without "scrollend" or when no scroll is needed
+        setTimeout(finish, 1000);
+        section.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
     },
     toggleLanguage() {
       console.log("Toggle language");

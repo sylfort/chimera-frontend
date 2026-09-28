@@ -73,7 +73,7 @@
       <img
         :src="responseImageUrl"
         alt="Response image"
-        class="preview"
+        class="preview response-preview"
         @click="openModal(responseImageUrl)"
       />
     </div>
@@ -178,7 +178,10 @@ export default {
         // };
 
         if (response && response.img) {
+          // Wait for the image to load so the layout is final before the page scrolls
+          await this.preloadImage(response.img);
           this.responseImageUrl = response.img;
+          await this.$nextTick();
         }
 
         if (response && response.results && response.results.class) {
@@ -199,6 +202,14 @@ export default {
         this.isUploading = false;
         this.imagePreview = null;
       }
+    },
+    preloadImage(src) {
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = resolve;
+        img.onerror = resolve;
+        img.src = src;
+      });
     },
     clearSelection() {
       this.selectedFile = null;
@@ -348,6 +359,11 @@ export default {
   cursor: zoom-in;
 }
 
+/* Image returned by the server is shown twice as big */
+.response-preview {
+  max-height: 300px;
+}
+
 /* Modal overlay styling */
 .modal-overlay {
   position: fixed;
@@ -456,6 +472,10 @@ input[type="file" i]::-webkit-file-upload-button {
   .preview {
     max-height: 250px; /* Optionally increase max-height for mobile */
     margin-left: 0; /* Remove negative margin to prevent overlapping */
+  }
+
+  .response-preview {
+    max-height: 500px;
   }
 
   /* The submit button comes last */
