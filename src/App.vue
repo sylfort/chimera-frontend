@@ -102,6 +102,7 @@ export default {
 }
 
 body {
+  margin: 0;
   background-color: #f9f7f0;
   background-image: radial-gradient(#f8d7da 1px, transparent 1px),
     radial-gradient(#c3e6cb 1px, transparent 1px);
@@ -131,13 +132,13 @@ body {
 #app {
   max-width: 900px;
   margin: 0 auto;
-  padding: 1em;
+  padding: 5px 1em 1em;
 }
 
-/* Compact desktop layout (same as viewing at 80% browser zoom) */
+/* Compact desktop layout (same as viewing at 90% browser zoom) */
 @media only screen and (min-width: 601px) {
   #app {
-    zoom: 0.8;
+    zoom: 0.9;
   }
 }
 
