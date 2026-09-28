@@ -1,16 +1,16 @@
 # Japanese Sweets Image Classifier - Frontend (Kinoko vs Takenoko)
 
 [![Backend Repo](https://img.shields.io/badge/Backend%20Repo-GitHub-blue?logo=github)](https://github.com/sylfort/yolo-chimera) <!-- Update link if backend repo is different -->
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](http://54.153.65.56/)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](http://yolo-1403983084.ap-northeast-1.elb.amazonaws.com/)
 
 This repository contains the Vue.js frontend for the Japanese Sweets Image Classifier project. It provides the user interface for uploading images, viewing detection results, checking the overall "popularity" leaderboard, and supports both English and Japanese languages.
 
-[View the Live Demo](http://54.153.65.56/)
+[View the Live Demo](http://yolo-1403983084.ap-northeast-1.elb.amazonaws.com/)
 
 ## Overview
 
 <p align="center">  <!-- Optional: align="center" or align="left" -->
-  <img src="https://github.com/user-attachments/assets/7aed6d80-abf9-44a0-8212-5ebc8451a783" alt="Kansai Ben Quest image" width="500">
+  <img src="https://github.com/user-attachments/assets/7aed6d80-abf9-44a0-8212-5ebc8451a783" alt="Kinoko vs Takenoko frontpage" width="500">
 </p>
 
 This single-page application (SPA) serves as the interactive client for the Python backend API. Users can:
