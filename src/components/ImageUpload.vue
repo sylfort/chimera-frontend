@@ -2,6 +2,38 @@
 <template>
   <div>
     <h2 class="h2-center">{{ $t("imageUpload.uploadTitle") }}</h2>
+
+    <!-- Sample images: drag into the drop zone or click to select -->
+    <p class="samples-hint">{{ $t("imageUpload.samplesHint") }}</p>
+    <div class="sample-gallery">
+      <figure
+        v-for="sample in samples"
+        :key="sample.key"
+        class="sample-card"
+        @click="selectSample(sample)"
+      >
+        <img
+          :src="sample.src"
+          :alt="sample.fileName"
+          draggable="true"
+          @dragstart="onSampleDragStart($event, sample)"
+        />
+      </figure>
+    </div>
+
+    <!-- Drop zone -->
+    <div
+      class="drop-zone"
+      :class="{ dragging: isDragging }"
+      @click="$refs.fileInput.click()"
+      @dragenter.prevent="isDragging = true"
+      @dragover.prevent="isDragging = true"
+      @dragleave.prevent="isDragging = false"
+      @drop.prevent="onDrop"
+    >
+      {{ $t("imageUpload.dropZone") }}
+    </div>
+
     <div class="image-upload">
       <label for="file-input" class="upload-button">
       {{ $t("imageUpload.chooseFile") }}
@@ -57,6 +89,14 @@
 
 <script>
 import { uploadImage as apiUploadImage } from "../api/api";
+import kinokoSample from "@/assets/kinoko16.jpg";
+import takenokoSample from "@/assets/takenoko16.jpg";
+
+const SAMPLES = [
+  { key: "kinoko", src: kinokoSample, fileName: "kinoko16.jpg" },
+  { key: "takenoko", src: takenokoSample, fileName: "takenoko16.jpg" },
+];
+const SAMPLE_MIME = "application/x-sample";
 
 export default {
   name: "ImageUpload",
@@ -69,12 +109,41 @@ export default {
       isUploading: false,
       errorMsg: "",
       showModal: false,
-      modalImage: ""
+      modalImage: "",
+      isDragging: false,
+      samples: SAMPLES
     };
   },
   methods: {
     onFileChange(e) {
-      const file = e.target.files[0];
+      this.setFile(e.target.files[0]);
+    },
+    onSampleDragStart(e, sample) {
+      e.dataTransfer.setData(SAMPLE_MIME, sample.key);
+      e.dataTransfer.effectAllowed = "copy";
+    },
+    onDrop(e) {
+      this.isDragging = false;
+      const files = e.dataTransfer.files;
+      if (files && files.length) {
+        this.setFile(files[0]);
+        return;
+      }
+      const key = e.dataTransfer.getData(SAMPLE_MIME);
+      const sample = this.samples.find(s => s.key === key);
+      if (sample) {
+        this.selectSample(sample);
+      }
+    },
+    async selectSample(sample) {
+      try {
+        const blob = await (await fetch(sample.src)).blob();
+        this.setFile(new File([blob], sample.fileName, { type: blob.type || "image/jpeg" }));
+      } catch (error) {
+        console.error("Failed to load sample image:", error);
+      }
+    },
+    setFile(file) {
       if (file && file.type.startsWith("image/")) {
         this.selectedFile = file;
         const reader = new FileReader();
@@ -145,6 +214,64 @@ export default {
 <style scoped>
 .h2-center {
   text-align: center;
+}
+
+.samples-hint {
+  text-align: center;
+  color: #555;
+  margin: 0 0 0.75em;
+}
+
+.sample-gallery {
+  display: flex;
+  justify-content: center;
+  gap: 1.5em;
+  flex-wrap: wrap;
+}
+
+.sample-card {
+  margin: 0;
+  width: 140px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.sample-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: grab;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sample-card img:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+.sample-card img:active {
+  cursor: grabbing;
+}
+
+.drop-zone {
+  max-width: 420px;
+  margin: 1.25em auto;
+  padding: 2em 1em;
+  border: 2px dashed #bbb;
+  border-radius: 12px;
+  text-align: center;
+  color: #666;
+  background-color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.drop-zone:hover,
+.drop-zone.dragging {
+  border-color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.08);
+  color: #3e8e41;
 }
 
 .image-upload {
@@ -281,6 +408,19 @@ input[type="file" i]::-webkit-file-upload-button {
 
 /* Mobile-specific styles */
 @media only screen and (max-width: 600px) {
+  .sample-gallery {
+    gap: 1em;
+  }
+
+  .sample-card {
+    width: 110px;
+  }
+
+  .drop-zone {
+    width: 90%;
+    box-sizing: border-box;
+  }
+
   .image-upload {
     flex-direction: column;
     align-items: center;

@@ -25,6 +25,8 @@ const messages = {
       invalidImage: "Please select a valid image file.",
       uploadFailed: "Upload failed. Please try again with a smaller file.",
       chooseFile: "Choose File",
+      samplesHint: "Try one of these — drag it into the box below or tap it",
+      dropZone: "Drag & drop an image here",
     },
   },
   ja: {
@@ -50,6 +52,8 @@ const messages = {
       invalidImage: "有効な画像ファイルを選択してください。",
       uploadFailed: "アップロードに失敗しました。再度お試しください。",
       chooseFile: "画像を選択",
+      samplesHint: "サンプル画像を下の枠にドラッグするか、タップして選択してください",
+      dropZone: "ここに画像をドラッグ＆ドロップ",
     },
   },
 };
