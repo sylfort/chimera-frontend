@@ -134,6 +134,13 @@ body {
   padding: 1em;
 }
 
+/* Compact desktop layout (same as viewing at 80% browser zoom) */
+@media only screen and (min-width: 601px) {
+  #app {
+    zoom: 0.8;
+  }
+}
+
 .app-header {
   text-align: center;
   margin-bottom: 2em;
